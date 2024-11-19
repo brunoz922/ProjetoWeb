@@ -1,0 +1,39 @@
+@model IEnumerable<Manutencao>
+
+<h1>Lista de Manutenções</h1>
+
+<p>
+    <a asp-action="Criar">Criar Nova Manutenção</a>
+</p>
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Numero de serie</th>
+        <th scope="col">Responsavel</th>
+        <th scope="col">Data</th>
+        <th scope="col">Tipo</th>
+        <th scope="col">Status</th>
+        <th scope="col">Ações</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var manutencao in Model)
+    {
+        <tr>
+            <td scope="row">@manutencao.Id</td>
+            <td>@manutencao.Recurso.NumeroSerie</td>
+            <td>@manutencao.Funcionario.Nome</td>
+            <td>@manutencao.Data.ToString("dd/M/yyyy")</td>
+            <td>@manutencao.Tipo</td>
+            <td>@manutencao.Status</td>
+            <td>
+                <a asp-action="Editar" asp-route-id="@manutencao.Id">Editar</a> |
+                <a asp-action="Detalhes" asp-route-id="@manutencao.Id">Detalhes</a> |
+                <a asp-action="Remover" asp-route-id="@manutencao.Id">Excluir</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

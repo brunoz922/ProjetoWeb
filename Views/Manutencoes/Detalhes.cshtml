@@ -1,0 +1,32 @@
+@model Manutencao
+
+<h2>Detalhes da Manutenção</h2>
+
+<div class="card">
+    <div class="card-body">
+        <p class="card-text">
+            <strong>Número de série do Maquinário: </strong>@Model.Recurso.NumeroSerie
+        </p>
+        <p class="card-text">
+            <strong>Funcionario Responsável: </strong>@Model.Funcionario.Nome
+        </p>
+        <p class="card-text">
+            <strong>Data do registro da manutenção: </strong>@Model.Data.ToString("dd/M/yyyy")
+        </p>
+        <p class="card-text">
+            <strong>Tipo: </strong>@Model.Tipo
+        </p>
+        <p class="card-text">
+            <strong>Status:</strong> @Model.Status
+        </p>
+        <p class="card-text">
+            <strong>Custos:</strong> @Model.Custos
+        </p>
+        <p class="card-text">
+            <strong>Descrição:</strong> @Model.Descricao
+        </p>
+
+
+        <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+    </div>
+</div>

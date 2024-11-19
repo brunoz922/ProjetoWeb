@@ -1,0 +1,41 @@
+@model IEnumerable<Compra>
+
+<h1>Lista de Compras</h1>
+
+<p>
+    <a asp-action="Criar">Criar Nova Compra</a>
+</p>
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Nome do Fornecedor</th>
+        <th scope="col">Nome do Responsável</th>
+        <th scope="col">Status</th>
+        <th scope="col">Forma de Pagamento</th>
+        <th scope="col">Forma de Entrega</th>
+        <th scope="col">Ações</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var compra in Model)
+    {
+        <tr>
+            <td scope="row">@compra.Id</td>
+            <td>@compra.Fornecedor.Nome</td>
+            <td>@compra.Funcionario.Nome</td>
+            <td>@compra.Status</td>
+            <td>@compra.FormaPagamento</td>
+            <td>@compra.FormaEntrega</td>
+
+            <td>
+                <a asp-action="Editar" asp-route-id="@compra.Id">Editar</a> |
+                <a asp-action="Detalhes" asp-route-id="@compra.Id">Detalhes</a> |
+                <a asp-action="Remover" asp-route-id="@compra.Id">Excluir</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

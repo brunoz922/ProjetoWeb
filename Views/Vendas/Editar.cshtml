@@ -1,0 +1,202 @@
+@model Venda
+
+
+<h2>Editar Venda</h2>
+
+<form asp-action="Editar" method="post" onsubmit="renomearItensVenda()">
+    <div class="form-group w-50 mb-3">
+        <label for="DataVenda">Data da Venda</label>
+        <input asp-for="DataVenda" class="form-control" type="date" id="DataVenda"/>
+    </div>
+
+    <div class="form-group w-50 mb-3">
+        <label for="ClienteId">Cliente</label>
+        <select asp-for="ClienteId" asp-items="ViewBag.Clientes" class="form-control"></select>
+    </div>
+
+    <div class="form-group w-50 mb-3">
+        <label for="FormaPagamento">Forma de Pagamento</label>
+        <select asp-for="FormaPagamento" asp-items="ViewBag.FormaPagamento" class="form-control"></select>
+    </div>
+    <div class="form-group w-50 mb-3">
+        <label for="FormaEntrega">Forma de Entrega</label>
+        <select asp-for="FormaEntrega" asp-items="ViewBag.FormaEntrega" class="form-control"></select>
+    </div>
+    <div class="form-group w-50 mb-3">
+        <label for="Status">Status</label>
+        <select asp-for="Status" asp-items="ViewBag.Status" class="form-control"></select>
+    </div>
+
+    <h4>Itens da Venda</h4>
+    <table class="table" id="itensVendaTable">
+        <thead>
+        <tr>
+            <th>Produto</th>
+            <th>Quantidade</th>
+            <th>Preço Unitário</th>
+            <th>SubTotal</th>
+            <th></th> <!-- Coluna para botão de remover item -->
+        </tr>
+        </thead>
+        <tbody id="itensVenda">
+        @foreach (var item in Model.ItensVenda)
+        {
+            <tr class="item-venda">
+                <td>
+                    <select name="ItensVenda[@item.Id].RecursoId" class="form-control  form-control-sm" onchange="atualizarPreco(@item.Id,this)">
+                        @foreach (var recurso in (IEnumerable<dynamic>)ViewBag.Recursos)
+                        {
+                            <!option value="@recurso.Id" data-preco="@recurso.Preco" @(recurso.Id == item.Recurso.Id ? "selected" : "")>@recurso.Nome</!option>
+                        }
+                    </select>
+                    <input type="hidden" name="ItensVenda[@item.Id].Id" value="@item.Id"/>
+                    <input type="hidden" name="ItensVenda[@item.Id].VendaId" value="@item.VendaId"/>
+                </td>
+                <td>
+                    <input type="number" step="1" min="0" max="1000" name="ItensVenda[@item.Id].Quantidade" class="form-control" value="@item.Quantidade" onchange="atualizarSubtotal(@item.Id,this)"/>
+                </td>
+                <td>
+                    <input type="text" name="ItensVenda[@item.Id].Preco" class="form-control preco" readonly value="@item.Preco" />
+                    <script>
+                                console.log("Teste1");
+                                console.log('@item.Preco');
+                                console.log("FimTeste1");
+                            </script>
+                </td>
+                <td>
+                    <input type="text" name="ItensVenda[@item.Id].SubTotal" class="form-control" readonly value="@item.SubTotal"/>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removerItem(this)">Remover</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <button type="button" class="btn btn-success" id="adicionarItem">Adicionar Item</button>
+    <br/>
+    <br/>
+
+    <div class="form-group" style="text-align: right;">
+        <label for="Total">Total da Venda:</label>
+        <input type="text" id="Total" class="form-control" readonly style="width: 100px; display: inline-block;"/>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a asp-action="Index" class="btn btn-secondary ml-2">Voltar</a>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let hoje = new Date().toISOString().split('T')[0];
+        document.getElementById("DataVenda").value = hoje;
+        atualizarTotalVenda();
+    });
+  
+    let itemIndexVenda = 0;
+
+    function renomearItensVenda() {
+        const items = document.querySelectorAll(".item-venda");
+        items.forEach((item, index) => {
+            item.querySelectorAll("select, input").forEach(input => {
+                const name = input.getAttribute("name");
+                if (name) {
+                    const newName = name.replace(/\[.*?\]/, `[${index}]`);
+                    input.setAttribute("name", newName);
+                }
+            });
+        });
+    }
+
+    document.getElementById("adicionarItem").addEventListener("click", function () {
+        let novaLinha = `
+            <tr class="item-venda">
+                <td>
+                    <select name="ItensVenda[].RecursoId" class="form-control form-control-sm" onchange="atualizarPreco(0,this)">
+                        @foreach (var recurso in (IEnumerable<dynamic>)ViewBag.Recursos)
+                        {
+                            <option value="@recurso.Id" data-preco="@recurso.Preco">@recurso.Nome</option>
+                        }
+                    </select>
+                </td>
+                <td><input type="number"  step="1" min="0" max="1000" name="ItensVenda[].Quantidade" class="form-control" onchange="atualizarSubtotal(0,this)" value="1"/></td>
+                <td><input type="text" name="ItensVenda[].Preco" class="form-control preco" readonly /></td>
+                <td><input type="text" name="ItensVenda[].SubTotal" class="form-control" readonly /></td>
+                <td><button type="button" class="btn btn-danger btn-sm" onclick="removerItem(this)">Remover</button></td>
+            </tr>`;
+        
+        document.getElementById("itensVenda").insertAdjacentHTML('beforeend', novaLinha);
+        
+        const ultimaLinha = document.getElementById("itensVenda").lastElementChild;
+        const selectProduto = ultimaLinha.querySelector('select[name="ItensVenda[].RecursoId"]');
+        atualizarPreco(0,selectProduto);        
+        atualizarTotalVenda();
+    });
+
+    function removerItem(botao) {
+        botao.closest('tr').remove();
+        atualizarTotalVenda();
+    }
+
+function atualizarSubtotal(index, input) {
+    const row = input.closest('tr');
+
+    let quantidade;
+    let preco;
+    
+    if (index !== 0 ) {
+        quantidade = parseFloat(row.querySelector(`input[name="ItensVenda[${index}].Quantidade"]`).value) || 0;
+        precostr = (row.querySelector(`input[name="ItensVenda[${index}].Preco"]`).value) || 0;
+        preco=parseFloat(precostr.replace(",","."));
+        const subtotal = quantidade * preco;
+        row.querySelector(`input[name="ItensVenda[${index}].SubTotal"]`).value = subtotal.toFixed(2).toString();
+
+    } else {
+        console.log("index do subtotal==0");
+        quantidade = parseFloat(row.querySelector(`input[name="ItensVenda[].Quantidade"]`).value) || 0;
+        precostr = (row.querySelector(`input[name="ItensVenda[].Preco"]`).value) || 0;
+        preco=parseFloat(precostr.replace(",","."));
+        const subtotal = quantidade * preco;
+        console.log("subtotal:"+subtotal);
+        row.querySelector(`input[name="ItensVenda[].SubTotal"]`).value = subtotal.toFixed(2).toString();
+    }
+    
+    atualizarTotalVenda();
+}
+
+
+    function atualizarPreco(index, selectElement) {
+        let row = selectElement.closest('tr'); 
+        let preco = selectElement.options[selectElement.selectedIndex].getAttribute('data-preco');
+        let precoInput;
+        if (index !== 0 ) {
+            precoInput = row.querySelector(`input[name="ItensVenda[${index}].Preco"]`);
+            } else {
+            console.log("index==0");
+            precoInput = row.querySelector(`input[name="ItensVenda[].Preco"]`);
+            console.log("testando se a função atualizarPreco pega o preco:"+preco);
+        }          
+
+        if (precoInput) {
+            precoInput.value = preco || '0,00'; 
+            console.log("testando se o preco foi inserido na variavel:"+precoInput.value);
+            atualizarSubtotal(index,precoInput); 
+        } else {
+            console.error("Campo de preço não encontrado.");
+        }
+        
+    }
+
+    function atualizarTotalVenda() {
+        let total = 0;
+        document.querySelectorAll('input[name^="ItensVenda"][name$=".SubTotal"]').forEach(function (input) {
+            console.log("somando ao total:"+input.value);
+            let inputstr=(input.value).replace(",",".");
+            console.log("somando ao total2:"+inputstr);
+            total += parseFloat(inputstr) || 0;
+        });
+        console.log("total calculado:"+total);
+        document.getElementById("Total").value = total.toFixed(2).toString();
+    }
+</script>

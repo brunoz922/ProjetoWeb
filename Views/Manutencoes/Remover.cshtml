@@ -1,0 +1,19 @@
+@model Manutencao
+
+<h2>Remover Manutenção</h2>
+
+<div>
+    <h4>Você tem certeza que deseja remover a Manutenção?</h4>
+    <p>Número de série do Maquinário: @Model.Recurso.NumeroSerie</p>
+    <p>Funcionario Responsável: @Model.Funcionario.Nome</p>
+    <p>Data do registro da manutenção: @Model.Data.ToString("dd/M/yyyy")</p>
+    <p>Tipo: @Model.Tipo</p>
+    <p>Status: @Model.Status</p>
+    <p>Custos: @Model.Custos</p>
+</div>
+
+<form asp-action="Remover" method="post">
+    <input type="hidden" asp-for="Id"/>
+    <button type="submit" class="btn btn-danger">Remover</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

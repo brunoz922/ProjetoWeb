@@ -1,0 +1,33 @@
+@model Plantio
+
+<h2>Detalhes do Plantio</h2>
+
+<div class="card">
+    <div class="card-body">
+        <p class="card-text"><strong>Data de plantio:</strong> @Model.DataPlantio.ToString("dd/M/yyyy")</p>
+        <p class="card-text"><strong>Área de Plantio:</strong> @Model.AreaPlantio.Nome</p>
+        <p class="card-text">
+            <strong>Itens do plantio:</strong>
+        </p>
+        <table class="table" id="ItensPlantio">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Numero de Serie</th>
+                    <th>Quantidade</th>
+                </tr>
+            </thead>
+            <tbody>
+        @if(Model.ItensPlantio!=null){
+            foreach(var item in Model.ItensPlantio){
+                <tr>
+                    <td>@item.Recurso.Nome</td>
+                    <td>@item.Recurso.NumeroSerie</td>
+                    <td>@item.Quantidade</td>
+                </tr>
+            }
+        }   
+        </tbody>
+        </table>
+        <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+</div>

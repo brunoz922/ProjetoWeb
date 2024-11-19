@@ -1,0 +1,36 @@
+@model Plantio
+
+<h2>Remover Plantio</h2>
+
+<div>
+    <h4>Você tem certeza que deseja remover o plantio?</h4>
+    <p>Data de Plantio: @Model.DataPlantio.ToString("dd/M/yyyy")</p>
+    <p>Área de Plantio: @Model.AreaPlantio.Nome</p>
+    <p>Itens do plantio:</p>
+     <table class="table" id="ItensPlantio">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Numero de Serie</th>
+                    <th>Quantidade</th>
+                </tr>
+            </thead>
+            <tbody>
+        @if(Model.ItensPlantio!=null){
+            foreach(var item in Model.ItensPlantio){
+                    <tr>
+                    <td>@item.Recurso.Nome</td>
+                    <td>@item.Recurso.NumeroSerie</td>
+                    <td>@item.Quantidade</td>
+                </tr>
+            }
+        }
+        </tbody>
+        </table>
+</div>
+
+<form asp-action="Remover" method="post">
+    <input type="hidden" asp-for="Id"/>
+    <button type="submit" class="btn btn-danger">Remover</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
